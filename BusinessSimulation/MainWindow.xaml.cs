@@ -24,7 +24,27 @@ namespace BusinessSimulation
         {
             InitializeComponent();
 
-            MessageBox.Show("der");
+
+            Engine.Initialize(20);
+            Engine.Location Location = new Engine.Location(5000)
+            {
+                Naam = "Barneveld",
+                Description = "mooie toko",
+                MaximalAmountOfItemsInStorage = 2000,
+                TotalMonthlyCost = 500,
+                Worth = 200000
+            };
+            
+
+           Engine.Business Business = new  Engine.Business(Location, 30000);
+           Engine.Businesses.Add(Business);
+
+
+        }
+
+        private void AdvanceCycle(object sender, RoutedEventArgs e)
+        {
+           Engine.Cycles.AdvanceCycle(); 
 
         }
     }

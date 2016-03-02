@@ -8,17 +8,58 @@ namespace BusinessSimulation
 {
     public static class Engine
     {
-       static List<Business> Businesses = new List<Business>();
+       static public List<Business> Businesses = new List<Business>();
+       static public int Turns {
+            get { return Cycles.TotalAmountOfCycles; }
+            set { Cycles.TotalAmountOfCycles = value; }
+        }
+
+
+       public static void Initialize(int AmountOfCycles)
+        {
+            Cycles.TotalAmountOfCycles = AmountOfCycles;
+
+            
+        }
+
+        public static class Cycles
+        {
+
+            public static int TotalAmountOfCycles = 0;
+            public static int CurrentCycle = 0;
+            public static void AdvanceCycle()
+            {
+                foreach (Business Business in Businesses)
+                {
+                    Business.Finances.CalculateProfit();
+                }
+                CurrentCycle++;
+            }
+        }
 
         public class Business {
-            public class History
-            {
+            
+            public BusinessHistory History = new BusinessHistory();
+            public BusinessFinances Finances = new BusinessFinances();
+            public BusinessMarket Market = new BusinessMarket();
+        
 
+            public Business(Location Location,int StartingBudget) {
+                this.Market.currentLocation = Location;
+                this.Finances.Budget = StartingBudget;
+
+            }
+
+           
+
+            public class BusinessHistory
+            {
+               List<Report> Reports = new List<Report>();
 
 
             }
 
-            public class Finances
+            public class BusinessFinances
             {
                 public int Budget = 0;
                 public bool checkBudget()
@@ -44,7 +85,6 @@ namespace BusinessSimulation
                     }
 
                 }
-
                 public Decimal CalculateProfit()
                 {
 
@@ -57,38 +97,50 @@ namespace BusinessSimulation
 
             }
 
-            public class Quantity
+            public class BusinessMarket
             {
                 public Location currentLocation { get; set; }
+                
+            }
 
+            public class Report {
+                Decimal Profit;
 
+            }
 
-
-
-                public class Location
+        }
+        public class Location
                 {
-
-
                     public String Naam { get; set; }
                     public String Description { get; set; }
                     public int Scope { get; set; }
                     public Decimal TotalMonthlyCost { get; set; }
                     public int MaximalAmountOfItemsInStorage { get; set; }
                     public Decimal Worth { get; set; }
+                    private Market LocationMarket;
 
 
-                    class customerCollection
+                    public Location(int Scope)
+                    {
+                        this.Scope = Scope;
+                        LocationMarket = new Market(this);
+                        LocationMarket.MakeNew();
+                    }
+
+                    
+
+                     class Market
                     {
                         private Location ParentLocation;
                         List<Customer> Customers = new List<Customer>();
 
-                        customerCollection(Location Location)
+                        public Market(Location Location)
                         {
                             ParentLocation = Location;
 
                         }
-
-                        void MakeNew()
+                
+                        public void MakeNew()
                         {
                             for (int Customer = 0; Customer < ParentLocation.Scope; Customer++)
                             {
@@ -132,9 +184,9 @@ namespace BusinessSimulation
 
                         public class CustomerStatistics
                         {
-                            customerCollection Customers;
+                            Market Customers;
 
-                            CustomerStatistics(customerCollection CustomerCollection)
+                            CustomerStatistics(Market CustomerCollection)
                             {
                                 this.Customers = CustomerCollection;
                             }
@@ -179,44 +231,6 @@ namespace BusinessSimulation
                         }
                     }
                 }
-            }
-
-
-        }
-
-        static public int Turns {
-            get { return Cycles.TotalAmountOfCycles; }
-            set { Cycles.TotalAmountOfCycles = value; }
-        }
-
-
-        public static void Initialize()
-        {
-            
-
-
-
-        }
-
-         static class Cycles
-        {
-
-            public static int TotalAmountOfCycles = 0;
-            public static int CurrentCycle = 0;
-            static void AdvanceCycle()
-            {
-                foreach (Business Business in Businesses)
-                {
-                    
-                }
-                CurrentCycle++;
-
-            }
-
-
-
-
-        }
 
 
     }
