@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static BusinessSimulation.Engine;
+
 
 namespace BusinessSimulation
 {
@@ -34,18 +36,33 @@ namespace BusinessSimulation
                 TotalMonthlyCost = 500,
                 Worth = 200000
             };
-            
 
-           Engine.Business Business = new  Engine.Business(Location, 30000);
-           Engine.Businesses.Add(Business);
+
+            Engine.Business Business = new Engine.Business(Location, 30000);
+            Engine.Businesses.Add(Business);
 
 
         }
 
         private void AdvanceCycle(object sender, RoutedEventArgs e)
         {
-           Engine.Cycles.AdvanceCycle(); 
+            Engine.Cycles.AdvanceCycle();
 
+        }
+
+        private void ViewReports(object sender, RoutedEventArgs e)
+        {
+            foreach (Business Business in Businesses)
+            {
+                foreach (Business.Report Report in Business.History.Reports)
+                {
+                    foreach (KeyValuePair<string, decimal> Data in Report.Data)
+                    {
+                        MessageBox.Show(Data.Key + " = " + Data.Value);
+                    }
+                }
+
+            }
         }
     }
 }

@@ -8,18 +8,19 @@ namespace BusinessSimulation
 {
     public static class Engine
     {
-       static public List<Business> Businesses = new List<Business>();
-       static public int Turns {
+        static public List<Business> Businesses = new List<Business>();
+        static public int Turns
+        {
             get { return Cycles.TotalAmountOfCycles; }
             set { Cycles.TotalAmountOfCycles = value; }
         }
 
 
-       public static void Initialize(int AmountOfCycles)
+        public static void Initialize(int AmountOfCycles)
         {
             Cycles.TotalAmountOfCycles = AmountOfCycles;
 
-            
+
         }
 
         public static class Cycles
@@ -37,31 +38,41 @@ namespace BusinessSimulation
             }
         }
 
-        public class Business {
-            
-            public BusinessHistory History = new BusinessHistory();
-            public BusinessFinances Finances = new BusinessFinances();
-            public BusinessMarket Market = new BusinessMarket();
-        
+        public class Business
+        {
 
-            public Business(Location Location,int StartingBudget) {
+            public BusinessHistory History = new BusinessHistory();
+            public BusinessFinances Finances;
+            public BusinessMarket Market = new BusinessMarket();
+
+
+            public Business(Location Location, int StartingBudget)
+            {
                 this.Market.currentLocation = Location;
+                this.Finances = new BusinessFinances(this);
                 this.Finances.Budget = StartingBudget;
 
             }
 
-           
+
 
             public class BusinessHistory
             {
-               List<Report> Reports = new List<Report>();
+                public List<Report> Reports = new List<Report>();
 
 
             }
 
             public class BusinessFinances
             {
+                private Business ParentBusiness;
                 public int Budget = 0;
+
+                public BusinessFinances(Business Business)
+                {
+                    ParentBusiness = Business;
+
+                }
                 public bool checkBudget()
                 {
                     if (Budget >= 0)
@@ -88,7 +99,12 @@ namespace BusinessSimulation
                 public Decimal CalculateProfit()
                 {
 
-                    return 0.0M;
+                    Report Report = new Report();
+                    Report.Profit = 90;
+                    Report.Data.Add("Profit", 90);
+
+                    ParentBusiness.History.Reports.Add(Report);
+                    return 90M;
 
 
 
@@ -100,137 +116,139 @@ namespace BusinessSimulation
             public class BusinessMarket
             {
                 public Location currentLocation { get; set; }
-                
+
             }
 
-            public class Report {
-                Decimal Profit;
+            public class Report
+            {
+                public Decimal Profit;
+                public Dictionary<String, Decimal> Data = new Dictionary<string, decimal>();
 
             }
 
         }
         public class Location
+        {
+            public String Naam { get; set; }
+            public String Description { get; set; }
+            public int Scope { get; set; }
+            public Decimal TotalMonthlyCost { get; set; }
+            public int MaximalAmountOfItemsInStorage { get; set; }
+            public Decimal Worth { get; set; }
+            private Market LocationMarket;
+
+
+            public Location(int Scope)
+            {
+                this.Scope = Scope;
+                LocationMarket = new Market(this);
+                LocationMarket.MakeNew();
+            }
+
+
+
+            class Market
+            {
+                private Location ParentLocation;
+                List<Customer> Customers = new List<Customer>();
+
+                public Market(Location Location)
                 {
-                    public String Naam { get; set; }
-                    public String Description { get; set; }
-                    public int Scope { get; set; }
-                    public Decimal TotalMonthlyCost { get; set; }
-                    public int MaximalAmountOfItemsInStorage { get; set; }
-                    public Decimal Worth { get; set; }
-                    private Market LocationMarket;
+                    ParentLocation = Location;
 
+                }
 
-                    public Location(int Scope)
+                public void MakeNew()
+                {
+                    for (int Customer = 0; Customer < ParentLocation.Scope; Customer++)
                     {
-                        this.Scope = Scope;
-                        LocationMarket = new Market(this);
-                        LocationMarket.MakeNew();
+                        //generate random customer
+                        Customer NewRandomCustomer = new Customer()
+                        {
+                            Age = 15,
+                            Income = 15000,
+                            PurchasingPower = 5
+                        };
+                        NewRandomCustomer.Wishes.Add("Cheap");
+
+                        Customers.Add(NewRandomCustomer);
                     }
 
-                    
 
-                     class Market
+                }
+                public int CalculatePurchasingPower()
+                {
+                    int TotalPurchasingPower = 0;
+                    foreach (Customer Customer in Customers)
                     {
-                        private Location ParentLocation;
-                        List<Customer> Customers = new List<Customer>();
+                        TotalPurchasingPower += Customer.PurchasingPower;
+                    }
+                    return TotalPurchasingPower;
 
-                        public Market(Location Location)
-                        {
-                            ParentLocation = Location;
 
-                        }
-                
-                        public void MakeNew()
+                }
+
+                class Customer
+                {
+                    public decimal Income { get; set; }
+                    public int Age { get; set; }
+                    public List<String> Wishes = new List<string>();
+                    public int PurchasingPower { get; set; }
+
+
+
+
+                }
+
+                public class RenameStatistics
+                {
+                    Market Customers;
+
+                    RenameStatistics(Market CustomerCollection)
+                    {
+                        this.Customers = CustomerCollection;
+                    }
+
+                    int PercentageWithWish(String Wish)
+                    {
+                        int TotalAmountOfCustomersWithThisWish = 0;
+
+                        foreach (Customer Customer in Customers.Customers)
                         {
-                            for (int Customer = 0; Customer < ParentLocation.Scope; Customer++)
+                            if (Customer.Wishes.Contains(Wish)) { }
                             {
-                                //generate random customer
-                                Customer NewRandomCustomer = new Customer()
+                                TotalAmountOfCustomersWithThisWish++;
+                            }
+                        }
+                        return TotalAmountOfCustomersWithThisWish * 100 / Customers.ParentLocation.Scope;
+                    }
+
+
+                    int PercentageWithWishes(List<String> WishList)
+                    {
+                        int TotalAmountOfCustomersWithTheseWishes = 0;
+                        foreach (Customer Customer in Customers.Customers)
+                        {
+                            bool CustomerMatches = false;
+                            foreach (String Wish in WishList)
+                            {
+                                if (Customer.Wishes.Contains(Wish))
                                 {
-                                    Age = 15,
-                                    Income = 15000,
-                                    PurchasingPower = 5
-                                };
-                                NewRandomCustomer.Wishes.Add("Cheap");
-
-                                Customers.Add(NewRandomCustomer);
-                            }
-
-
-                        }
-                        public int CalculatePurchasingPower()
-                        {
-                            int TotalPurchasingPower = 0;
-                            foreach (Customer Customer in Customers)
-                            {
-                                TotalPurchasingPower += Customer.PurchasingPower;
-                            }
-                            return TotalPurchasingPower;
-
-
-                        }
-
-                        class Customer
-                        {
-                            public decimal Income { get; set; }
-                            public int Age { get; set; }
-                            public List<String> Wishes = new List<string>();
-                            public int PurchasingPower { get; set; }
-
-
-
-
-                        }
-
-                        public class CustomerStatistics
-                        {
-                            Market Customers;
-
-                            CustomerStatistics(Market CustomerCollection)
-                            {
-                                this.Customers = CustomerCollection;
-                            }
-
-                            int PercentageWithWish(String Wish)
-                            {
-                                int TotalAmountOfCustomersWithThisWish = 0;
-
-                                foreach (Customer Customer in Customers.Customers)
-                                {
-                                    if (Customer.Wishes.Contains(Wish)) { }
-                                    {
-                                        TotalAmountOfCustomersWithThisWish++;
-                                    }
+                                    CustomerMatches = true;
+                                    break;
                                 }
-                                return TotalAmountOfCustomersWithThisWish * 100 / Customers.ParentLocation.Scope;
                             }
-
-
-                            int PercentageWithWishes(List<String> WishList)
+                            if (CustomerMatches)
                             {
-                                int TotalAmountOfCustomersWithTheseWishes = 0;
-                                foreach (Customer Customer in Customers.Customers)
-                                {
-                                    bool CustomerMatches = false;
-                                    foreach (String Wish in WishList)
-                                    {
-                                        if (Customer.Wishes.Contains(Wish))
-                                        {
-                                            CustomerMatches = true;
-                                            break;
-                                        }
-                                    }
-                                    if (CustomerMatches)
-                                    {
-                                        TotalAmountOfCustomersWithTheseWishes++;
-                                    }
-                                }
-                                return TotalAmountOfCustomersWithTheseWishes * 100 / Customers.ParentLocation.Scope;
-
+                                TotalAmountOfCustomersWithTheseWishes++;
                             }
                         }
+                        return TotalAmountOfCustomersWithTheseWishes * 100 / Customers.ParentLocation.Scope;
+
                     }
                 }
+            }
+        }
 
 
     }
