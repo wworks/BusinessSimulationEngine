@@ -22,13 +22,14 @@ namespace BusinessSimulation
     /// </summary>
     public partial class MainWindow : Window
     {
+        
         public MainWindow()
         {
             InitializeComponent();
 
 
             Engine.Initialize(20);
-            Engine.Location Location = new Engine.Location(5000)
+            Location Location = new Engine.Location(5000)
             {
                 Naam = "Barneveld",
                 Description = "mooie toko",
@@ -38,8 +39,13 @@ namespace BusinessSimulation
             };
 
 
-            Engine.Business Business = new Engine.Business(Location, 30000);
-            Engine.Businesses.Add(Business);
+            Business Business = new Engine.Business(Location, 30000);
+
+            Businesses.Add(Business);
+
+            RegisterPlugins(Business);
+
+
 
 
         }
@@ -49,20 +55,54 @@ namespace BusinessSimulation
             Engine.Cycles.AdvanceCycle();
 
         }
-
         private void ViewReports(object sender, RoutedEventArgs e)
         {
             foreach (Business Business in Businesses)
             {
-                foreach (Business.Report Report in Business.History.Reports)
+
+                for (int Report = 0; Report < Business.History.Reports.Count - 1; Report++)
                 {
-                    foreach (KeyValuePair<string, decimal> Data in Report.Data)
+                   Report currReport = Business.History.Reports.ElementAt(Report);
+
+                    foreach (KeyValuePair<string, decimal> Data in currReport.Data)
                     {
-                        MessageBox.Show(Data.Key + " = " + Data.Value);
+                        MessageBox.Show(Report+1 + " : " + Data.Key + " = " + Data.Value);
                     }
+
+                }
+
+                foreach (Report Report in Business.History.Reports)
+                {
                 }
 
             }
         }
+
+
+        private void RegisterPlugins(Business Business)
+        {
+
+            Engine.Business.BusinessFinances.PerformCalculation  DoTax = TaxCost;
+            int Phase = (int)Engine.Business.BusinessFinances.Phases.CalculateMonthlyCost;
+            
+
+            Business.Finances.RegisterPlugin(Phase,DoTax);
+
+
+
+
+        }
+
+        private void TaxCost(ref decimal MonthlyCost)
+        {
+            MonthlyCost =MonthlyCost* 0.9M;
+
+
+        }
+
     }
+
+
 }
+
+

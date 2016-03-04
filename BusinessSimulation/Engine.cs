@@ -43,14 +43,16 @@ namespace BusinessSimulation
 
             public BusinessHistory History = new BusinessHistory();
             public BusinessFinances Finances;
-            public BusinessMarket Market = new BusinessMarket();
+
+            public Location currentLocation { get; set; }
 
 
             public Business(Location Location, int StartingBudget)
             {
-                this.Market.currentLocation = Location;
+                this.currentLocation = Location;
                 this.Finances = new BusinessFinances(this);
                 this.Finances.Budget = StartingBudget;
+
 
             }
 
@@ -63,9 +65,10 @@ namespace BusinessSimulation
 
             }
 
+
             public class BusinessFinances
             {
-                private Business ParentBusiness;
+                Business ParentBusiness;
                 public int Budget = 0;
 
                 public BusinessFinances(Business Business)
@@ -96,12 +99,40 @@ namespace BusinessSimulation
                     }
 
                 }
+
+
+                
+                public delegate void PerformCalculation(ref decimal Argument);
+                private List<Tuple<int, PerformCalculation>> Plugins = new List<Tuple<int, PerformCalculation>>();
+                public enum Phases
+                {
+                    CalculateMonthlyCost = 0
+                };
+                public bool RegisterPlugin(int Phase, PerformCalculation Action)
+                {
+                    Plugins.Add(new Tuple<int, PerformCalculation>(Phase, Action));
+                    return true;
+
+                }
+
+
                 public Decimal CalculateProfit()
                 {
+                    decimal MonthlyCost = 0;
+                    MonthlyCost = ParentBusiness.currentLocation.TotalMonthlyCost;
+
+
+                    //Phase CalculateMonthlyCost
+                    foreach (Tuple<int, PerformCalculation> Action in Plugins.Where<Tuple<int, PerformCalculation>>(x => x.Item1 == (int)Phases.CalculateMonthlyCost))
+                    {
+                        Action.Item2(ref MonthlyCost);
+
+
+                    }
 
                     Report Report = new Report();
-                    Report.Profit = 90;
-                    Report.Data.Add("Profit", 90);
+                    Report.Profit = MonthlyCost;
+                    Report.Data.Add("Profit", MonthlyCost);
 
                     ParentBusiness.History.Reports.Add(Report);
                     return 90M;
@@ -111,22 +142,19 @@ namespace BusinessSimulation
                 }
 
 
-            }
-
-            public class BusinessMarket
-            {
-                public Location currentLocation { get; set; }
 
             }
 
-            public class Report
-            {
-                public Decimal Profit;
-                public Dictionary<String, Decimal> Data = new Dictionary<string, decimal>();
-
-            }
 
         }
+
+        public class Report
+        {
+            public Decimal Profit;
+            public Dictionary<String, Decimal> Data = new Dictionary<string, decimal>();
+
+        }
+
         public class Location
         {
             public String Naam { get; set; }
@@ -200,11 +228,11 @@ namespace BusinessSimulation
 
                 }
 
-                public class RenameStatistics
+                public class MarketStatistics
                 {
                     Market Customers;
 
-                    RenameStatistics(Market CustomerCollection)
+                    MarketStatistics(Market CustomerCollection)
                     {
                         this.Customers = CustomerCollection;
                     }
@@ -250,6 +278,7 @@ namespace BusinessSimulation
             }
         }
 
-
     }
+
 }
+
