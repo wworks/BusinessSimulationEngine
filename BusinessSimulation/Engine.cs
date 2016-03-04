@@ -194,7 +194,47 @@ namespace BusinessSimulation
 
 
             }
-            public class Promotion { }
+            public class Publicity
+            {
+                public decimal PublicityFactor;
+                public List<Advertisement> Advertisements = new List<Advertisement>();
+
+                public decimal getAdvertisementsCostPerCycle()
+                {
+                    Decimal AdvertisementsCostPerCycle = 0;
+                    Advertisements.ForEach(Advertisement => AdvertisementsCostPerCycle += Advertisement.CostPerCycle);
+                    return AdvertisementsCostPerCycle;
+                }
+                /// <summary>
+                /// Needs to happen each cycle
+                /// </summary>
+                public void  recalculatePublicityFactor()
+                {
+                    //do stuff
+                    PublicityFactor = 1.0M * PublicityFactor;
+
+
+
+                }
+
+
+
+                public class Advertisement
+                {
+                    public string Name;
+                    public decimal EffectivenessFactor;
+                    public decimal CostPerCycle;
+                    public bool Active;
+                    public int ActiveCyclesCount;
+
+
+
+                }
+
+
+
+
+            }
 
             public class BusinessPersonnel
 
@@ -454,5 +494,6 @@ namespace BusinessSimulation
 
     }
 
+    
 }
 
