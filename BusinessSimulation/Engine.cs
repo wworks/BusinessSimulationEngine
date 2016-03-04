@@ -8,27 +8,27 @@ namespace BusinessSimulation
 {
     public static class Engine
     {
+        //Collections of game objects
         static public List<Business> Businesses = new List<Business>();
         static public List<Product> Products = new List<Product>();
         static public List<Supplier> Suppliers = new List<Supplier>();
         static public List<Machine> Machines = new List<Machine>();
         static public List<Employee> Employees = new List<Employee>();
 
-
+        //Easy acces:
         static public int Turns
         {
             get { return Cycles.TotalAmountOfCycles; }
             set { Cycles.TotalAmountOfCycles = value; }
         }
 
-
+        //Main Engine
         public static void Initialize(int AmountOfCycles)
         {
             Cycles.TotalAmountOfCycles = AmountOfCycles;
 
 
         }
-
         public static class Cycles
         {
 
@@ -44,15 +44,10 @@ namespace BusinessSimulation
             }
         }
 
+        //Business class
         public class Business
         {
-
-            public BusinessHistory History = new BusinessHistory();
-            public BusinessFinances Finances;
-            public BusinessPersonnel Personnel;
-
             public Location currentLocation { get; set; }
-
 
             public Business(Location Location, int StartingBudget)
             {
@@ -64,13 +59,17 @@ namespace BusinessSimulation
             }
 
 
+            public BusinessHistory History = new BusinessHistory();
+            public BusinessFinances Finances;
+            public BusinessPersonnel Personnel;
+            public BusinessPublicity Publicity = new BusinessPublicity();
+            public BusinessProductInventory ProductInventory = new BusinessProductInventory();
+            public BusinessMachineInventory MachineInventory = new BusinessMachineInventory();
 
             public class BusinessHistory
             {
                 public List<Report> Reports = new List<Report>();
             }
-
-
             public class BusinessFinances
             {
                 Business ParentBusiness;
@@ -149,8 +148,7 @@ namespace BusinessSimulation
 
 
             }
-
-            public class ProductInventory
+            public class BusinessProductInventory
             {
                 public int MaximalAmountOfItemsInStorage { get; set; }
                 public List<Product> BoughtProducts = new List<Product>();
@@ -188,13 +186,13 @@ namespace BusinessSimulation
                 }
 
             }
-            public class MachineInventory
+            public class BusinessMachineInventory
             {
                 public List<Machine> BoughtMachines = new List<Machine>();
 
 
             }
-            public class Publicity
+            public class BusinessPublicity
             {
                 public decimal PublicityFactor;
                 public List<Advertisement> Advertisements = new List<Advertisement>();
@@ -208,7 +206,7 @@ namespace BusinessSimulation
                 /// <summary>
                 /// Needs to happen each cycle
                 /// </summary>
-                public void  recalculatePublicityFactor()
+                public void recalculatePublicityFactor()
                 {
                     //do stuff
                     PublicityFactor = 1.0M * PublicityFactor;
@@ -235,7 +233,6 @@ namespace BusinessSimulation
 
 
             }
-
             public class BusinessPersonnel
 
 
@@ -303,73 +300,10 @@ namespace BusinessSimulation
             }
         }
 
-        public class Employee
-        {
-            public string Name = "Nameless";
-            public int ProductsPerCycle = 0;
-            public decimal SalaryPerCycle;
-            public Business Employer;
 
-            public override string ToString()
-            {
-                return Name;
-            }
-        }
-        public class Supplier
-        {
-            public string Name;
-            public List<Product> getProducts()
-            {
-                return (List<Product>)Products.Where<Product>(product => product.Supplier == this);
+        //Gamewide classes, for multiple businesses
 
-
-            }
-
-
-        }
-        public class Machine
-        {
-            public string Name;
-            public decimal currentWorth;
-            public decimal NewWorth;
-            public int OutputCapacity;
-
-
-
-
-        }
-        public class Product
-        {
-            public string Name;
-            public Supplier Supplier;
-            public decimal SellingPrice = 0.0M;
-            public decimal PurchasingPrice = 0.0M;
-            public int packageSize;
-
-            /// <summary>
-            /// These properties will be matched with the whishes of the customers.
-            /// </summary>
-            public List<String> Properties = new List<string>();
-
-            public int QuantityInStore = -1;
-
-
-
-        }
-
-
-        public class Report
-        {
-            public int Cycle;
-            public Report()
-            {
-                Cycle = Cycles.CurrentCycle;
-
-            }
-            public Dictionary<String, Decimal> Data = new Dictionary<string, decimal>();
-
-        }
-
+        //Map bases
         public class Location
         {
             public String Naam { get; set; }
@@ -389,9 +323,7 @@ namespace BusinessSimulation
 
 
         }
-
-
-        class Market
+        public class Market
         {
             public int Size;
             List<Customer> Customers = new List<Customer>();
@@ -491,9 +423,79 @@ namespace BusinessSimulation
                 }
             }
         }
+        public class Employee
+        {
+            public string Name = "Nameless";
+            public int ProductsPerCycle = 0;
+            public decimal SalaryPerCycle;
+            public Business Employer;
+
+            public override string ToString()
+            {
+                return Name;
+            }
+        }
+
+        
+        //inventories
+        public class Supplier
+        {
+            public string Name;
+            public List<Product> getProducts()
+            {
+                return (List<Product>)Products.Where<Product>(product => product.Supplier == this);
+
+
+            }
+
+
+        }
+        public class Product
+        {
+            public string Name;
+            public Supplier Supplier;
+            public decimal SellingPrice = 0.0M;
+            public decimal PurchasingPrice = 0.0M;
+            public int packageSize;
+
+            /// <summary>
+            /// These properties will be matched with the whishes of the customers.
+            /// </summary>
+            public List<String> Properties = new List<string>();
+
+            public int QuantityInStore = -1;
+
+
+
+        }
+
+        public class Machine
+        {
+            public string Name;
+            public decimal currentWorth;
+            public decimal NewWorth;
+            public int OutputCapacity;
+
+
+
+
+        }
+
+        //data
+        public class Report
+        {
+            public int Cycle;
+            public Report()
+            {
+                Cycle = Cycles.CurrentCycle;
+
+            }
+            public Dictionary<String, Decimal> Data = new Dictionary<string, decimal>();
+
+        }
 
     }
 
-    
+
 }
 
