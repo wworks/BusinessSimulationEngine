@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static BusinessSimulation.Engine;
-
+using Plugins = BusinessSimulation.Engine.Business.BusinessFinances;
 
 namespace BusinessSimulation
 {
@@ -45,8 +45,10 @@ namespace BusinessSimulation
 
             RegisterPlugins(Business);
 
+            Business.Personnel.EmployeeAdded += EmployeeAdded;
 
-
+            Employee Employee = new Employee();
+            Employees.Add(Employee);
 
         }
 
@@ -79,13 +81,27 @@ namespace BusinessSimulation
         }
 
 
+
+        /// <summary>
+        /// Phases:
+        ///  
+        /// 
+        /// </summary>
+        /// <param name="Business"></param>
+        /// 
+        private void EmployeeAdded(object sender,EventArgs e)
+        {
+            MessageBox.Show("Employee added");
+
+        }
         private void RegisterPlugins(Business Business)
         {
-
-            Engine.Business.BusinessFinances.PerformCalculation  DoTax = TaxCost;
-            int Phase = (int)Engine.Business.BusinessFinances.Phases.CalculateMonthlyCost;
+           
             
 
+            Plugins.PerformCalculation  DoTax = TaxCost;
+            int Phase = (int)Plugins.Phases.CalculateMonthlyCost;
+            
             Business.Finances.RegisterPlugin(Phase,DoTax);
 
 
@@ -100,6 +116,13 @@ namespace BusinessSimulation
 
         }
 
+        private void AddEmployee(object sender, RoutedEventArgs e)
+
+        {
+            Businesses.First<Business>().Personnel.Employ(Employees.First<Employee>());
+            
+
+        }
     }
 
 

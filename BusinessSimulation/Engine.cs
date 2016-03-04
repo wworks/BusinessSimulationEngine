@@ -9,6 +9,12 @@ namespace BusinessSimulation
     public static class Engine
     {
         static public List<Business> Businesses = new List<Business>();
+        static public List<Product> Products = new List<Product>();
+        static public List<Supplier> Suppliers = new List<Supplier>();
+        static public List<Machine> Machines = new List<Machine>();
+        static public List<Employee> Employees = new List<Employee>();
+
+
         static public int Turns
         {
             get { return Cycles.TotalAmountOfCycles; }
@@ -43,6 +49,7 @@ namespace BusinessSimulation
 
             public BusinessHistory History = new BusinessHistory();
             public BusinessFinances Finances;
+            public BusinessPersonnel Personnel;
 
             public Location currentLocation { get; set; }
 
@@ -52,7 +59,7 @@ namespace BusinessSimulation
                 this.currentLocation = Location;
                 this.Finances = new BusinessFinances(this);
                 this.Finances.Budget = StartingBudget;
-
+                this.Personnel = new BusinessPersonnel(this);
 
             }
 
@@ -61,8 +68,6 @@ namespace BusinessSimulation
             public class BusinessHistory
             {
                 public List<Report> Reports = new List<Report>();
-
-
             }
 
 
@@ -82,7 +87,8 @@ namespace BusinessSimulation
                     {
                         return true;
                     }
-                    else {
+                    else
+                    {
                         return false;
 
                     }
@@ -101,7 +107,7 @@ namespace BusinessSimulation
                 }
 
 
-                
+
                 public delegate void PerformCalculation(ref decimal Argument);
                 private List<Tuple<int, PerformCalculation>> Plugins = new List<Tuple<int, PerformCalculation>>();
                 public enum Phases
@@ -145,8 +151,133 @@ namespace BusinessSimulation
 
             }
 
+            public class ProductInventory
+            {
+                public List<Product> BoughtProducts = new List<Product>();
 
+
+                public int getTotalAmountOfProductsInInventory()
+                {
+                    int TotalAmountOfProductsInInventory = 0;
+                    foreach (Product Product in BoughtProducts)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    return TotalAmountOfProductsInInventory;
+
+                }
+
+                public decimal getInventoryWorth()
+                {
+                    decimal InventoryWorth = 0;
+
+                    foreach (Product Product in BoughtProducts)
+                    {
+                        throw new NotImplementedException();
+
+                    }
+                    return InventoryWorth;
+
+                }
+                public void Buy(Product Product)
+                {
+                    BoughtProducts.Add(Product);
+
+                    throw new NotImplementedException();
+
+                }
+
+            }
+            public class MachineInventory
+            {
+                public List<Machine> BoughtMachines = new List<Machine>();
+
+
+            }
+            public class Promotion { }
+
+            public class BusinessPersonnel
+
+
+            {
+                public event EventHandler EmployeeAdded;
+
+
+
+
+                Business ParentBusiness;
+
+                public BusinessPersonnel(Business Business)
+
+                {
+                    ParentBusiness = Business;
+
+                }
+
+                public List<Employee> getEmployees()
+                {
+
+                    List<Employee> EmployedEmployees = new List<Employee>();
+                    foreach (Employee Employee in Employees)
+                    {
+                        if (Employee.Employer == ParentBusiness)
+                        {
+                            EmployedEmployees.Add(Employee);
+                        }
+                    }
+                    return EmployedEmployees;
+
+                }
+
+
+                public void Employ(Employee Employee)
+                {
+                    Employee.Employer = ParentBusiness;
+                    EmployeeAdded(ParentBusiness, new EventArgs());
+
+                    
+
+
+                }
+                public decimal getTotalPersonnelCosts()
+                {
+                    decimal TotalPersonnelCosts = 0;
+                    foreach (Employee Employee in getEmployees())
+                    {
+                        TotalPersonnelCosts += Employee.SalaryPerCycle;
+                    }
+                    return TotalPersonnelCosts;
+                }
+                public int getTotalProductsPerCycle()
+                {
+                    int TotalProductsPerCycle = 0;
+                    foreach (Employee Employee in getEmployees())
+                    {
+                        TotalProductsPerCycle += Employee.ProductsPerCycle;
+
+                    }
+                    return TotalProductsPerCycle;
+
+
+                }
+            }
         }
+
+        public class Employee
+        {
+            public string Name = "Nameless";
+            public int ProductsPerCycle = 0;
+            public decimal SalaryPerCycle;
+            public Business Employer;
+
+            public override string ToString()
+            {
+                return Name;
+            }
+        }
+        public class Supplier { }
+        public class Machine { }
+        public class Product { }
 
         public class Report
         {
@@ -173,107 +304,107 @@ namespace BusinessSimulation
                 LocationMarket.MakeNew();
             }
 
+        }
 
 
-            class Market
+        class Market
+        {
+            private Location ParentLocation;
+            List<Customer> Customers = new List<Customer>();
+
+            public Market(Location Location)
             {
-                private Location ParentLocation;
-                List<Customer> Customers = new List<Customer>();
+                ParentLocation = Location;
 
-                public Market(Location Location)
+            }
+
+            public void MakeNew()
+            {
+                for (int Customer = 0; Customer < ParentLocation.Scope; Customer++)
                 {
-                    ParentLocation = Location;
+                    //generate random customer
+                    Customer NewRandomCustomer = new Customer()
+                    {
+                        Age = 15,
+                        Income = 15000,
+                        PurchasingPower = 5
+                    };
+                    NewRandomCustomer.Wishes.Add("Cheap");
 
+                    Customers.Add(NewRandomCustomer);
                 }
 
-                public void MakeNew()
+
+            }
+            public int CalculatePurchasingPower()
+            {
+                int TotalPurchasingPower = 0;
+                foreach (Customer Customer in Customers)
                 {
-                    for (int Customer = 0; Customer < ParentLocation.Scope; Customer++)
+                    TotalPurchasingPower += Customer.PurchasingPower;
+                }
+                return TotalPurchasingPower;
+
+
+            }
+
+            class Customer
+            {
+                public decimal Income { get; set; }
+                public int Age { get; set; }
+                public List<String> Wishes = new List<string>();
+                public int PurchasingPower { get; set; }
+
+
+
+
+            }
+
+            public class MarketStatistics
+            {
+                Market Customers;
+
+                MarketStatistics(Market CustomerCollection)
+                {
+                    this.Customers = CustomerCollection;
+                }
+
+                int PercentageWithWish(String Wish)
+                {
+                    int TotalAmountOfCustomersWithThisWish = 0;
+
+                    foreach (Customer Customer in Customers.Customers)
                     {
-                        //generate random customer
-                        Customer NewRandomCustomer = new Customer()
+                        if (Customer.Wishes.Contains(Wish)) { }
                         {
-                            Age = 15,
-                            Income = 15000,
-                            PurchasingPower = 5
-                        };
-                        NewRandomCustomer.Wishes.Add("Cheap");
-
-                        Customers.Add(NewRandomCustomer);
+                            TotalAmountOfCustomersWithThisWish++;
+                        }
                     }
-
-
-                }
-                public int CalculatePurchasingPower()
-                {
-                    int TotalPurchasingPower = 0;
-                    foreach (Customer Customer in Customers)
-                    {
-                        TotalPurchasingPower += Customer.PurchasingPower;
-                    }
-                    return TotalPurchasingPower;
-
-
+                    return TotalAmountOfCustomersWithThisWish * 100 / Customers.ParentLocation.Scope;
                 }
 
-                class Customer
+
+                int PercentageWithWishes(List<String> WishList)
                 {
-                    public decimal Income { get; set; }
-                    public int Age { get; set; }
-                    public List<String> Wishes = new List<string>();
-                    public int PurchasingPower { get; set; }
-
-
-
-
-                }
-
-                public class MarketStatistics
-                {
-                    Market Customers;
-
-                    MarketStatistics(Market CustomerCollection)
+                    int TotalAmountOfCustomersWithTheseWishes = 0;
+                    foreach (Customer Customer in Customers.Customers)
                     {
-                        this.Customers = CustomerCollection;
-                    }
-
-                    int PercentageWithWish(String Wish)
-                    {
-                        int TotalAmountOfCustomersWithThisWish = 0;
-
-                        foreach (Customer Customer in Customers.Customers)
+                        bool CustomerMatches = false;
+                        foreach (String Wish in WishList)
                         {
-                            if (Customer.Wishes.Contains(Wish)) { }
+                            if (Customer.Wishes.Contains(Wish))
                             {
-                                TotalAmountOfCustomersWithThisWish++;
+                                CustomerMatches = true;
+                                break;
                             }
                         }
-                        return TotalAmountOfCustomersWithThisWish * 100 / Customers.ParentLocation.Scope;
-                    }
-
-
-                    int PercentageWithWishes(List<String> WishList)
-                    {
-                        int TotalAmountOfCustomersWithTheseWishes = 0;
-                        foreach (Customer Customer in Customers.Customers)
+                        if (CustomerMatches)
                         {
-                            bool CustomerMatches = false;
-                            foreach (String Wish in WishList)
-                            {
-                                if (Customer.Wishes.Contains(Wish))
-                                {
-                                    CustomerMatches = true;
-                                    break;
-                                }
-                            }
-                            if (CustomerMatches)
-                            {
-                                TotalAmountOfCustomersWithTheseWishes++;
-                            }
+                            TotalAmountOfCustomersWithTheseWishes++;
                         }
-                        return TotalAmountOfCustomersWithTheseWishes * 100 / Customers.ParentLocation.Scope;
-
                     }
+                    return TotalAmountOfCustomersWithTheseWishes * 100 / Customers.ParentLocation.Scope;
+
                 }
             }
         }

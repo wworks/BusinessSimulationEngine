@@ -9,6 +9,7 @@
     <Grid>
         <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Height="37" Margin="121,161,0,0" VerticalAlignment="Top" Width="98" Click="AdvanceCycle"/>
         <Button x:Name="button_Copy" Content="Button" HorizontalAlignment="Left" Height="37" Margin="238,161,0,0" VerticalAlignment="Top" Width="98" Click="ViewReports"/>
+        <Button x:Name="button_Copy1" Content="ad demployee" HorizontalAlignment="Left" Height="37" Margin="355,161,0,0" VerticalAlignment="Top" Width="98" Click="AddEmployee" RenderTransformOrigin="1.969,0.447"/>
 
     </Grid>
 </Window>
