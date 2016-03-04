@@ -22,18 +22,17 @@ namespace BusinessSimulation
     /// </summary>
     public partial class MainWindow : Window
     {
-        
+
         public MainWindow()
         {
             InitializeComponent();
 
 
             Engine.Initialize(20);
-            Location Location = new Engine.Location(5000)
+            Location Location = new Engine.Location()
             {
                 Naam = "Barneveld",
-                Description = "mooie toko",
-                MaximalAmountOfItemsInStorage = 2000,
+                Description = "big and valueable",
                 TotalMonthlyCost = 500,
                 Worth = 200000
             };
@@ -64,11 +63,11 @@ namespace BusinessSimulation
 
                 for (int Report = 0; Report < Business.History.Reports.Count - 1; Report++)
                 {
-                   Report currReport = Business.History.Reports.ElementAt(Report);
+                    Report currReport = Business.History.Reports.ElementAt(Report);
 
                     foreach (KeyValuePair<string, decimal> Data in currReport.Data)
                     {
-                        MessageBox.Show(Report+1 + " : " + Data.Key + " = " + Data.Value);
+                        MessageBox.Show(Report + 1 + " : " + Data.Key + " = " + Data.Value);
                     }
 
                 }
@@ -89,20 +88,20 @@ namespace BusinessSimulation
         /// </summary>
         /// <param name="Business"></param>
         /// 
-        private void EmployeeAdded(object sender,EventArgs e)
+        private void EmployeeAdded(object sender, EventArgs e)
         {
             MessageBox.Show("Employee added");
 
         }
         private void RegisterPlugins(Business Business)
         {
-           
-            
 
-            Plugins.PerformCalculation  DoTax = TaxCost;
+
+
+            Plugins.PerformCalculation DoTax = TaxCost;
             int Phase = (int)Plugins.Phases.CalculateMonthlyCost;
-            
-            Business.Finances.RegisterPlugin(Phase,DoTax);
+
+            Business.Finances.RegisterPlugin(Phase, DoTax);
 
 
 
@@ -111,7 +110,7 @@ namespace BusinessSimulation
 
         private void TaxCost(ref decimal MonthlyCost)
         {
-            MonthlyCost =MonthlyCost* 0.9M;
+            MonthlyCost = MonthlyCost * 0.9M;
 
 
         }
@@ -120,7 +119,7 @@ namespace BusinessSimulation
 
         {
             Businesses.First<Business>().Personnel.Employ(Employees.First<Employee>());
-            
+
 
         }
     }

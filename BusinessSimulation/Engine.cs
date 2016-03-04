@@ -137,7 +137,6 @@ namespace BusinessSimulation
                     }
 
                     Report Report = new Report();
-                    Report.Profit = MonthlyCost;
                     Report.Data.Add("Profit", MonthlyCost);
 
                     ParentBusiness.History.Reports.Add(Report);
@@ -153,6 +152,7 @@ namespace BusinessSimulation
 
             public class ProductInventory
             {
+                public int MaximalAmountOfItemsInStorage { get; set; }
                 public List<Product> BoughtProducts = new List<Product>();
 
 
@@ -235,7 +235,7 @@ namespace BusinessSimulation
                     Employee.Employer = ParentBusiness;
                     EmployeeAdded(ParentBusiness, new EventArgs());
 
-                    
+
 
 
                 }
@@ -275,13 +275,57 @@ namespace BusinessSimulation
                 return Name;
             }
         }
-        public class Supplier { }
-        public class Machine { }
-        public class Product { }
+        public class Supplier
+        {
+            public string Name;
+            public List<Product> getProducts()
+            {
+                return (List<Product>)Products.Where<Product>(product => product.Supplier == this);
+
+
+            }
+
+
+        }
+        public class Machine
+        {
+            public string Name;
+            public decimal currentWorth;
+            public decimal NewWorth;
+            public int OutputCapacity;
+
+
+
+
+        }
+        public class Product
+        {
+            public string Name;
+            public Supplier Supplier;
+            public decimal SellingPrice = 0.0M;
+            public decimal PurchasingPrice = 0.0M;
+            public int packageSize;
+
+            /// <summary>
+            /// These properties will be matched with the whishes of the customers.
+            /// </summary>
+            public List<String> Properties = new List<string>();
+
+            public int QuantityInStore = -1;
+
+
+
+        }
+
 
         public class Report
         {
-            public Decimal Profit;
+            public int Cycle;
+            public Report()
+            {
+                Cycle = Cycles.CurrentCycle;
+
+            }
             public Dictionary<String, Decimal> Data = new Dictionary<string, decimal>();
 
         }
@@ -290,37 +334,36 @@ namespace BusinessSimulation
         {
             public String Naam { get; set; }
             public String Description { get; set; }
-            public int Scope { get; set; }
+
             public Decimal TotalMonthlyCost { get; set; }
-            public int MaximalAmountOfItemsInStorage { get; set; }
             public Decimal Worth { get; set; }
-            private Market LocationMarket;
 
+            public Tuple<int, int> mapLocation = new Tuple<int, int>(0, 0);
 
-            public Location(int Scope)
+            public int getScope()
             {
-                this.Scope = Scope;
-                LocationMarket = new Market(this);
-                LocationMarket.MakeNew();
+                //do positional stuff
+                return 0;
+
             }
+
 
         }
 
 
         class Market
         {
-            private Location ParentLocation;
+            public int Size;
             List<Customer> Customers = new List<Customer>();
 
-            public Market(Location Location)
+            public Market(int Size)
             {
-                ParentLocation = Location;
-
+                this.Size = Size;
             }
 
             public void MakeNew()
             {
-                for (int Customer = 0; Customer < ParentLocation.Scope; Customer++)
+                for (int Customer = 0; Customer < Size; Customer++)
                 {
                     //generate random customer
                     Customer NewRandomCustomer = new Customer()
@@ -380,7 +423,7 @@ namespace BusinessSimulation
                             TotalAmountOfCustomersWithThisWish++;
                         }
                     }
-                    return TotalAmountOfCustomersWithThisWish * 100 / Customers.ParentLocation.Scope;
+                    return TotalAmountOfCustomersWithThisWish * 100 / Customers.Size;
                 }
 
 
@@ -403,7 +446,7 @@ namespace BusinessSimulation
                             TotalAmountOfCustomersWithTheseWishes++;
                         }
                     }
-                    return TotalAmountOfCustomersWithTheseWishes * 100 / Customers.ParentLocation.Scope;
+                    return TotalAmountOfCustomersWithTheseWishes * 100 / Customers.Size;
 
                 }
             }
